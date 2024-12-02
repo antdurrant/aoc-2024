@@ -1,0 +1,17 @@
+# load ----
+x <- read.table("./data/01")
+
+# part 1 ----
+sum(
+  abs(
+    sort(x$V1) - sort(x$V2)
+  )
+)
+
+# part 2 ----
+sum(
+  mapply(
+    \(y) sum(y == x$V2)*y,
+    x$V1
+  )
+)
