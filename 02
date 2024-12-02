@@ -1,0 +1,47 @@
+dummy <- "7 6 4 2 1
+1 2 7 8 9
+9 7 6 2 1
+1 3 2 4 5
+8 6 4 4 1
+1 3 6 7 9
+"
+
+
+f <- tempfile()
+
+cat(dummy, file =  f)
+
+
+# part 1 ----
+pt1 <- function(x) {
+  y <- diff(x)
+  (all(y > 0) | all(y < 0)) & all(abs(y) %in% 1:3)
+}
+
+# part 2 ----
+# looks like the longest isn't very long,
+# just brute force it
+pt2 <- function(x){
+  
+  if(pt1(x)) return(TRUE)
+  
+  any(
+    sapply(
+      seq_along(x),
+      \(i) fn(x[-i])
+    )
+  )
+}
+
+
+dat <-
+  mapply(
+    as.numeric,
+    strsplit(readLines("./data/02.txt"), " "),
+    SIMPLIFY = FALSE
+  )
+
+sum(mapply(pt1, dat))
+
+sum(mapply(pt2, dat))
+
