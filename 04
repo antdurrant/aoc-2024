@@ -1,0 +1,74 @@
+# helpers ----
+read_file <- function(f) {
+  as.matrix(
+    read.fwf(
+      f,
+      rep(1, nchar(readLines(f, 1))),
+      header = FALSE
+    )
+  )
+}
+
+check_seq <- function(x, check = c("X", "M", "A", "S")) all(x == check) | all(x == rev(check))
+
+check_line <- function(a, len_add = 3) {
+  seqs <- mapply(\(x) a[x:(x+len_add)], 1:(length(a)-len_add), SIMPLIFY = FALSE)
+  sum(mapply(check_seq, seqs))
+}
+
+get_diags <- function(m, min_len=4){
+  # mirrored matrix for other diagonals
+  l <- m[, rev(seq(ncol(m)))]
+  
+  Filter(
+    \(x) length(x) >= min_len,
+    c(
+      # diagonals in each direction
+      mapply(\(x) m[row(m) == col(m)+x], -ncol(m):ncol(m)),
+      mapply(\(x) l[row(l) == col(l)+x], -nrow(l):nrow(l))
+    )
+  )
+  
+}
+
+
+f <- read_file("./data/04")
+
+# part 1 ----
+part_1 <- function(mat){
+  rows <- apply(mat, 1, check_line)
+  cols <- apply(mat, 2, check_line)
+  diags <- mapply(check_line, get_diags(mat))
+  sum(rows, cols, diags)
+}
+
+part_1(f)
+
+# part 2 ----
+check_diags <- function(mat, check = c("M", "A", "S")){
+  all(
+    mapply(
+      \(x) all(x == check) | all(x == rev(check)),
+      get_diags(mat, length(check))
+    )
+  )
+}
+
+part_2 <- function(mat){
+  # matrix subsets
+  row_seqs <- mapply(\(x) seq(x, length.out = 3), seq(nrow(mat)-2), SIMPLIFY = FALSE)
+  col_seqs <- mapply(\(x) seq(x, length.out = 3), seq(ncol(mat)-2), SIMPLIFY = FALSE)
+  
+  nrow(
+    subset(
+      expand.grid(row = row_seqs, col = col_seqs),
+      mapply(
+        \(x,y) check_diags(mat[x,y]),
+        row, col
+      )
+    )
+  )
+  
+}
+
+part_2(f)
