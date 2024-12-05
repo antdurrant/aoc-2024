@@ -23,45 +23,17 @@ find_correct_order <- function(rules,update){
   c(setdiff(update, v$V2), names(sort(table(v$V2))))
 }
 
-
-is_correct_order <- function(rules, updates){
-  # if the correct order and the actual order match,
-  # it is valid
-  all(find_correct_order(rules,updates) == updates)
-}
-
 # been treating the numbers as characters up until now
 middle_num <- function(x) as.numeric(x[ceiling(length(x)/2)])
-
-
-part_1 <- function(updates,valids){
-  sum(
-    mapply(
-      middle_num,
-      # only keep the valid updates
-      updates[valids]
-    )
-  )
-}
-
-part_2 <- function(u,r,v){
-  sum(
-    mapply(
-      middle_num,
-      mapply(
-        # keep the correct order
-        \(x) find_correct_order(r, x),
-        # only keep the invalid updates
-        u[!v]
-        )
-    )
-  )
-}
 
 file <- "./data/05"
 rules <- read_rules(file)
 updates <- read_updates(file)
-valids <- mapply(\(x) is_correct_order(rules, x), updates)
+corrects <- mapply(\(x) find_correct_order(rules,x), updates)
+valids <- mapply(\(x,y) all(x == y), updates, corrects)
 
-part_1(updates, valids)
-part_2(updates,rules,valids)
+# part 1
+sum(mapply(middle_num, updates[valids]))
+# part 2
+sum(mapply(middle_num, corrects[!valids]))
+
