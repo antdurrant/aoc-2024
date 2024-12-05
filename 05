@@ -30,7 +30,7 @@ file <- "./data/05"
 rules <- read_rules(file)
 updates <- read_updates(file)
 corrects <- mapply(\(x) find_correct_order(rules,x), updates)
-valids <- mapply(\(x,y) all(x == y), updates, corrects)
+valids <- mapply(identical, updates, corrects)
 
 # part 1
 sum(mapply(middle_num, updates[valids]))
