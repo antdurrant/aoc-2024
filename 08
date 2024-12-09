@@ -1,0 +1,131 @@
+g <- "............
+........0...
+.....0......
+.......0....
+....0.......
+......A.....
+............
+............
+........A...
+.........A..
+............
+............"
+
+g <-
+    "..........
+...#......
+..........
+....a.....
+..........
+.....a....
+..........
+......#...
+..........
+.........."
+f<- tempfile()
+cat(g, file = f)
+
+parse_input <- function(f){
+    read.fwf(
+        f, 
+        rep(1, nchar(readLines(f, 1))),
+        FALSE,
+        comment.char = ""
+    )
+}
+x <- parse_input(f)
+
+thing = "a"
+
+get_positions <- function(x, thing){
+    
+    locs <- as.data.frame(which(x == thing, arr.ind = TRUE))
+    
+    if(nrow(locs) == 0) return(locs)
+    
+    combn(
+        seq(nrow(locs)),
+        2,
+        FUN = \(x) locs[x,] + matrix(c(-apply(locs[x,], 2, diff), apply(locs[x,], 2, diff)),nrow = 2, byrow = TRUE),
+        simplify = FALSE 
+    )
+    
+}
+# 
+# new_locs <-
+#     mapply(
+#     \(x,y,z) function(to) seq(from = z, to = to, by = x),
+#     apply(locs,2, diff),
+#     locs[1,]
+# )
+
+
+
+diffs <- apply(locs, 2, diff)
+locs[1,1]
+
+row_down <- seq(from = locs[1,1], to = 1, by = -diffs[1])
+col_down <- seq(from = locs[1,2], to = 1, by = -diffs[2])
+
+down_len <- pmin(length(row_down), length(col_down))
+
+
+row_up <- seq(from = locs[2,1], to = nrow(x), by = diffs[1])
+col_up <- seq(from = locs[2,2], to = ncol(x), by = diffs[1])
+
+seq(10, 1, by = -3)
+
+get_positions_2 <- function(x, thing){
+    
+    locs <- as.data.frame(which(x == thing, arr.ind = TRUE))
+    
+    if(nrow(locs) == 0) return(locs)
+    
+    combn(
+        seq(nrow(locs)),
+        2,
+        # FUN = \(x) locs[x,] + matrix(c(-apply(locs[x,], 2, diff), apply(locs[x,], 2, diff)),nrow = 2, byrow = TRUE),
+        FUN = \(x) locs[x,] 
+        simplify = FALSE 
+    )
+    
+}
+
+combine_positions <- function(x){
+    
+    Reduce(
+        rbind,
+        mapply(
+            \(things) Reduce(rbind, get_positions(x, things)),
+            c(letters, LETTERS, 0:9),
+            SIMPLIFY = FALSE
+        )
+    )
+    
+}
+
+check_positions <- function(x, input){
+    unique(
+        subset(
+            x,
+            row >= 1 & row <= nrow(input) &
+                col >= 1 & col <= ncol(input)
+        )
+    )
+}
+
+part_1 <- function(f){
+    input <- parse_input(f)
+    
+    input |> 
+        combine_positions() |>
+        check_positions(input) |>
+        nrow() 
+}
+
+
+
+x <- "~/Downloads/08.txt"
+
+part_1(f)
+part_1(x)
