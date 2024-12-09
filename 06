@@ -1,0 +1,210 @@
+d <- 
+  "....#.....
+.........#
+..........
+..#.......
+.......#..
+..........
+.#..^.....
+........#.
+#.........
+......#..."
+f<- tempfile()
+cat(d, file = f)
+
+parse_input <- function(f) as.matrix(read.fwf(f, rep(1, nchar(readLines(f,1))), comment.char = ""))
+x <- parse_input(f)
+
+kind <- "^"
+
+change <- \(x) switch(x,`^` = ">",`>` = "V", `V` = "<",`<` = "^")
+
+
+get_new_loc <- function(kind, loc){
+  switch(
+    kind,
+    `^` = loc-1:0,
+    `>` = loc+0:1,
+    `V` = loc+1:0,
+    `<` = loc-0:1
+  )
+}
+
+part_1 <- function(x, kind){
+  loc <- which(x == kind, arr.ind = TRUE)
+  
+  repeat{
+    new_loc <- get_new_loc(kind, loc)
+    
+    x[loc[1], loc[2]] <- "X"
+    
+    
+    if(any(new_loc < 1) | any(new_loc > c(nrow(x), ncol(x)))) break
+    
+    if(x[new_loc[1], new_loc[2]] == "#") {
+      kind <- change(kind)
+      new_loc <- get_new_loc(kind, loc)
+      
+    }
+    
+    if(any(new_loc < 1) | any(new_loc > c(nrow(x), ncol(x)))) break
+    
+    
+    x[new_loc[1], new_loc[2]] <- kind
+    loc <- new_loc
+  }
+  sum(x == "X")
+  
+}
+x <- parse_input(f)
+x <- parse_input("~/Desktop/06.txt")
+
+part_1(x, kind = "^")
+
+
+
+# part 2 ----
+# keep track of directions
+
+x
+
+
+part_2 <- function(x, kind){
+  loc <- which(x == kind, arr.ind = TRUE)
+  first <- loc
+  dirs <- list(`<` = x, `>` = x, `^` = x, V = `x`)
+
+  y <- matrix(0, nrow(x), ncol(x))
+  y[x == "#"] <- NA
+  repeat{
+    new_loc <- get_new_loc(kind, loc)
+    
+    x[loc[1], loc[2]] <- "X"
+    y[loc[1], loc[2]] <- y[loc[1], loc[2]]+1
+    
+    
+    if(any(new_loc < 1) | any(new_loc > c(nrow(x), ncol(x)))) break
+    
+    if(x[new_loc[1], new_loc[2]] == "#") {
+      kind <- change(kind)
+      new_loc <- get_new_loc(kind, loc)
+      
+    }
+    
+    if(any(new_loc < 1) | any(new_loc > c(nrow(x), ncol(x)))) break
+    
+    
+    x[new_loc[1], new_loc[2]] <- kind
+    loc <- new_loc
+  }
+  
+  # which(y <1, arr.ind = TRUE)
+  # sum(y>1, na.rm = TRUE)
+  y
+}
+part_2(x, "^")
+d <- 
+  "....#.....
+.........#
+..........
+..#.......
+.......#..
+..........
+.#..^.....
+........#.
+#.........
+......#..."
+f<- tempfile()
+cat(d, file = f)
+
+parse_input <- function(f) as.matrix(read.fwf(f, rep(1, nchar(readLines(f,1))), comment.char = ""))
+x <- parse_input(f)
+
+kind <- "^"
+
+change <- \(x) switch(x,`^` = ">",`>` = "V", `V` = "<",`<` = "^")
+
+
+get_new_loc <- function(kind, loc){
+  switch(
+    kind,
+    `^` = loc-1:0,
+    `>` = loc+0:1,
+    `V` = loc+1:0,
+    `<` = loc-0:1
+  )
+}
+
+part_1 <- function(x, kind){
+  loc <- which(x == kind, arr.ind = TRUE)
+  
+  repeat{
+    new_loc <- get_new_loc(kind, loc)
+    
+    x[loc[1], loc[2]] <- "X"
+    
+    
+    if(any(new_loc < 1) | any(new_loc > c(nrow(x), ncol(x)))) break
+    
+    if(x[new_loc[1], new_loc[2]] == "#") {
+      kind <- change(kind)
+      new_loc <- get_new_loc(kind, loc)
+      
+    }
+    
+    if(any(new_loc < 1) | any(new_loc > c(nrow(x), ncol(x)))) break
+    
+    
+    x[new_loc[1], new_loc[2]] <- kind
+    loc <- new_loc
+  }
+  sum(x == "X")
+  
+}
+x <- parse_input(f)
+x <- parse_input("~/Desktop/06.txt")
+
+part_1(x, kind = "^")
+
+
+
+# part 2 ----
+# keep track of directions
+
+x
+
+
+part_2 <- function(x, kind){
+  loc <- which(x == kind, arr.ind = TRUE)
+  first <- loc
+  dirs <- list(`<` = x, `>` = x, `^` = x, V = `x`)
+
+  y <- matrix(0, nrow(x), ncol(x))
+  y[x == "#"] <- NA
+  repeat{
+    new_loc <- get_new_loc(kind, loc)
+    
+    x[loc[1], loc[2]] <- "X"
+    y[loc[1], loc[2]] <- y[loc[1], loc[2]]+1
+    
+    
+    if(any(new_loc < 1) | any(new_loc > c(nrow(x), ncol(x)))) break
+    
+    if(x[new_loc[1], new_loc[2]] == "#") {
+      kind <- change(kind)
+      new_loc <- get_new_loc(kind, loc)
+      
+    }
+    
+    if(any(new_loc < 1) | any(new_loc > c(nrow(x), ncol(x)))) break
+    
+    
+    x[new_loc[1], new_loc[2]] <- kind
+    loc <- new_loc
+  }
+  
+  # which(y <1, arr.ind = TRUE)
+  # sum(y>1, na.rm = TRUE)
+  y
+}
+part_2(x, "^")
