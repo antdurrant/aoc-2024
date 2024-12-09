@@ -1,0 +1,32 @@
+options(scipen = 999)
+
+parse_input <- function(f){
+    readLines(f) |>
+    strsplit(":? ") |>
+    sapply(as.numeric)
+}
+
+
+get_part_1_ops <- function(x){
+    Reduce(
+        \(x,y) c(x+y, x*y),
+        x
+    )
+}
+
+
+get_part_2_ops <- function(x){
+    Reduce(
+        \(x,y) c(x+y, x*y, as.numeric(paste0(x,y))),
+        x
+    )
+}
+
+day_7 <- function(x, fn){
+
+    results <- mapply(fn, mapply(\(x) tail(x,-1), x))
+    targets <- mapply(\(x) head(x,1), x)
+    valids <- mapply(\(x,y) x %in% y, targets, results)
+    
+    sum(targets[valids])
+}
