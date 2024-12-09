@@ -1,0 +1,77 @@
+parse_input <- function(f){
+    x <- as.numeric(strsplit(readLines(f), "")[[1]])
+    files <- x[seq_along(x) %% 2==1] 
+    spaces <- x[seq_along(x) %% 2==0]
+    
+    file_marks <- mapply(\(x,y) rep(x,y), seq_along(files)-1,files)
+    space_marks <- mapply(\(x,y) rep(x,y), NA, spaces)
+    
+    # files may be one longer than spaces
+    if(length(space_marks) < length(file_marks)) space_marks <- c(space_marks, list(numeric()))
+    
+    unlist(mapply(c,file_marks, space_marks))
+    
+}
+
+fix_seq_1 <- function(x){
+    n_not_na <- sum(!is.na(x))
+    w_ <- which(is.na(x))
+    w <- w_[w_<=n_not_na]
+    
+    reps <- rev(tail(x[!is.na(x)], length(w)))
+    
+    x[w] <- reps
+    x[seq(n_not_na)]
+}
+
+checksum <- function(x){
+    sum(x*(seq_along(x)-1), na.rm = TRUE)
+}
+
+part_1 <- function(input){
+    checksum(fix_seq_1(input))
+}
+
+
+fix_seq_2 <- function(all_marks, lvl){
+    # lvl <- lvls[10]
+    w <- which(all_marks == lvl)
+    len <- length(w)
+    # only look to the left of the files
+    nas <- which(is.na(all_marks[1:min(w)]))
+
+    # replace the first place that fits 
+    # if it exists
+    if(length(nas) > 0){
+        for(x in nas){
+            s <- seq(from = x, length.out = len)
+            res <- all(is.na(all_marks[s]))
+            if(res) {
+                all_marks[w] <- NA
+                all_marks[s] <- lvl
+                return(all_marks)
+            }
+            
+        }
+    }
+    
+    all_marks
+}
+
+part_2 <- function(input){
+    lvls <- rev(unique(input[!is.na(input)]))  
+    checksum(Reduce(fix_seq_2, lvls, input))    
+}
+
+
+tictoc::tic()
+input <- parse_input("~/Downloads/09.txt")
+part_1(input)
+tictoc::toc()
+tictoc::tic()
+part_2(input)
+tictoc::toc()
+
+# # use rle for something smarter?
+# r <- rle(c(1,1,2,2,NA, 3))
+# cumsum(r$lengths)
