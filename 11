@@ -1,0 +1,29 @@
+# couldn't figure out a base version of mutate > unnest > count, so this one is {tidyverse}
+
+library(tidyverse)
+options(scipen = 999)
+
+rules <- function(x, step){
+  n <- nchar(x)
+  if(x == 0) return(1)
+  if(n %% 2 == 0) return(as.numeric(c(substr(x, 1, n/2), substr(x, n/2+1, n))))
+  x * 2024
+}
+
+blink <- function(x,y){
+  x %>% 
+    mutate(x = map(x, rules)) %>% 
+    unnest(x) %>% 
+    count(x, wt = n)
+}
+
+x <- c(5910927, 0, 1, 47, 261223, 94788, 545, 7771)
+
+start <- 
+  data.frame(x) %>%
+  count(x)
+
+# part 1 ----
+sum(Reduce(blink, 1:25, start)$n)
+# part 2 ----
+sum(Reduce(blink, 1:75, start)$n)
