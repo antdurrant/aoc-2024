@@ -1,0 +1,37 @@
+parse_input <- function(f){
+    as.matrix(read.fwf(f, rep(1, nchar(readLines(f, 1))), FALSE, comment.char = ""))
+}
+
+get_ind <- function(m, d){
+    within(
+        as.data.frame(which(m == d, arr.ind = TRUE)),
+        w <- which(m == d)
+    )
+}
+
+get_routes <- function(table_a, table_b){
+    merge(
+        rbind(within(table_a, row <- row+1),
+              within(table_a, row <- row-1),
+              within(table_a, col <- col+1),
+              within(table_a, col <- col-1)
+        ),
+        table_b[c("row", "col")]
+    )
+}
+
+get_all_routes <- function(m){
+    p <- Map(\(d) get_ind(m, d), 0:9)
+    Reduce(get_routes, p)
+}
+
+part_1 <- function(m){
+    sum(!duplicated.data.frame(get_all_routes(m)))
+}
+
+part_1(parse_input("./data/10.txt"))
+
+part_2 <- function(m){
+    nrow(get_all_routes)
+}
+part_2(parse_input("./data/10.txt"))
