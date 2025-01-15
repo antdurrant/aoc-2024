@@ -1,0 +1,65 @@
+extract_nums <- function(x){
+    m <- gregexpr("-?\\d+", x)
+    Map(as.numeric, regmatches(x, m))
+}
+
+parse_input <- function(f){
+    extract_nums(readLines(f))
+}
+
+# I set it to start plotting every .1 seconds while thinking…
+# it _tells you what to do in part 1_
+# not very pretty, but it’ll do
+
+
+translate <- function(nums, times, max_x, max_y){
+    c(
+        (nums[1]+nums[3]*times) %% max_x, 
+        (nums[2]+nums[4]*times) %% max_y
+    ) +1
+}
+
+get_quadrant <- function(x, max_x, max_y){
+    mid_x <- ceiling(max_x/2)
+    mid_y <- ceiling(max_y/2)
+    x_quad <- x[1] < mid_x
+    y_quad <- x[2] < mid_y
+    
+    if(x[1] == mid_x | x[2] == mid_y) return(NA)
+    
+    if(x_quad & y_quad) return(1)
+    if(!x_quad & y_quad) return(2)
+    if(x_quad & !y_quad) return(3)
+    if(!x_quad & !y_quad) return(4)
+}
+
+count_quadrants <- function(x, times = 100, max_x, max_y){
+    Map(translate, x, MoreArgs = list(times = times, max_x = max_x, max_y = max_y)) |>
+        sapply(get_quadrant, max_x, max_y) |>
+        table()
+}
+
+part_1 <- function(x, max_x, max_y) prod(count_quadrants(x, 100, max_x, max_y))
+
+
+x <- parse_input("~/Desktop/14.txt")
+
+
+part_1(x, max_x = 101, max_y = 103)
+
+# part 2 ----
+
+look_for_tree <- function(x, times, max_x, max_y) max(count_quadrants(x, times, max_x, max_y))
+
+# how many in the heaviest quadrant?
+heavy_quadrants <- mapply(\(n) look_for_tree(x, n, max_x = 101, max_y = 103), 1:2e4)
+
+# eyeball it for a cutoff point
+hist(heavy_quadrants)
+
+check <- which(heavy > 250)
+
+# is there a tree? yes! 
+plot(t(mapply(\(x) head(x, 2), Map(translate, x, MoreArgs = list(times = check[1], max_x = max_x, max_y = max_y)))))
+
+check[1]
